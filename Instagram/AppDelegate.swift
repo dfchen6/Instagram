@@ -7,15 +7,42 @@
 //
 
 import UIKit
+import Parse
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    
+    let myAppId = "Instagram"
+    let myClientKey = "834qdjdo9dlqcjdhcl39qdoedkhqdo"
+    let myServer = "https://fast-springs-61807.herokuapp.com/parse"
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        Parse.setApplicationId(myAppId, clientKey: myClientKey)
+        
+        // check if user is logged in.
+        if PFUser.currentUser() != nil {
+            // if there is a logged in user then load the home view controller
+            let storyboad = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboad.instantiateViewControllerWithIdentifier("tabBarBoard")
+            window?.rootViewController = vc
+        }
+        
+        NSNotificationCenter.defaultCenter().addObserverForName("userDidLogoutNotification", object: nil, queue: NSOperationQueue.mainQueue()) { (NSNotification) -> Void in
+            let storyboad = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboad.instantiateInitialViewController()
+            self.window?.rootViewController = vc
+        }
+
+        Parse.initializeWithConfiguration(
+            ParseClientConfiguration(block: { (configuration:ParseMutableClientConfiguration) -> Void in
+                configuration.applicationId = "Instagram"
+                configuration.clientKey = "834qdjdo9dlqcjdhcl39qdoedkhqdo"
+                configuration.server = "https://fast-springs-61807.herokuapp.com/parse"
+            })
+        )
         return true
     }
 
