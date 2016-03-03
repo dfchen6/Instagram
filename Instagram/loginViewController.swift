@@ -35,22 +35,7 @@ class loginViewController: UIViewController {
     }
     
     @IBAction func onSignUp(sender: AnyObject) {
-        // initialize a user object
-        let newUser = PFUser()
-        
-        // set user properties
-        newUser.username = userNameTextField.text
-        newUser.password = passwordTextField.text
-        
-        // call sign up function on the object
-        newUser.signUpInBackgroundWithBlock { (success: Bool, error: NSError?) -> Void in
-            if let error = error {
-                print(error.localizedDescription)
-            } else {
-                print("User Registered successfully")
-                // manually segue to logged in view
-            }
-        }
+
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
