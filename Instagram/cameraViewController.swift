@@ -15,14 +15,56 @@ class cameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     
     @IBOutlet weak var captionTextField: UITextField!
     
+    @IBOutlet weak var segmentControl: UISegmentedControl!
+    
     var uploadImage: UIImage!
+    
+    var gotImage = false
+    var imageQuality = 0.25
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
     
-    @IBAction func onCamera(sender: AnyObject) {
+    override func viewDidAppear(animated: Bool) {
+        // Add tap image view responder
+        let tapSelectImage = UITapGestureRecognizer(target: self, action: "tapSelect:")
+        tapSelectImage.numberOfTapsRequired = 1
+        imageView.userInteractionEnabled = true
+        imageView.addGestureRecognizer(tapSelectImage)
+        cameraOn()
+    }
+    
+    func tapSelect(sender: UITapGestureRecognizer!) {
+        gotImage = false
+        print("tap image")
+        cameraOn()
+    }
+    func updateImageView() {
+        let resizedImage = resize(uploadImage, percentage: Float(imageQuality))
+        imageView.image = resizedImage
+    }
+    
+    @IBAction func ImageQualityChanged(sender: UISegmentedControl) {
+        switch segmentControl.selectedSegmentIndex
+        {
+        case 0:
+            imageQuality = 0.25
+        case 1:
+            imageQuality = 0.4
+        case 2:
+            imageQuality = 0.7
+        default:
+            break;
+        }
+        updateImageView()
+    }
+    
+    func cameraOn() {
+        if (gotImage) {
+            return
+        }
         let vc = UIImagePickerController()
         vc.delegate = self
         vc.allowsEditing = true
@@ -33,21 +75,24 @@ class cameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         }
         
         self.presentViewController(vc, animated: true, completion: nil)
+        gotImage = true
+
     }
+    
     
     func imagePickerController(picker: UIImagePickerController,
         didFinishPickingMediaWithInfo info: [String : AnyObject]) {
             let originalImage = info[UIImagePickerControllerOriginalImage] as! UIImage
             let editedImage = info[UIImagePickerControllerEditedImage] as! UIImage
-            let resizedImage = resize(originalImage, percentage: 0.5)
-            uploadImage = resizedImage
-            imageView.image = resizedImage
+            uploadImage = editedImage
+            imageView.image = editedImage
             self.dismissViewControllerAnimated(true, completion: {})
     }
     
     @IBAction func onUpload(sender: AnyObject) {
+        let resizedImage = resize(uploadImage, percentage: Float(imageQuality))
         let caption = captionTextField.text
-        UserMedia.postUserImage(uploadImage, withCaption: caption) { (flag: Bool, error: NSError?) -> Void in
+        UserMedia.postUserImage(resizedImage, withCaption: caption) { (flag: Bool, error: NSError?) -> Void in
             if (error == nil) {
                 print("upload image successfully")
                 self.clearTextAndImage()
@@ -55,6 +100,7 @@ class cameraViewController: UIViewController, UIImagePickerControllerDelegate, U
                 print(error?.localizedDescription)
             }
         }
+        gotImage = false
     }
     
     func clearTextAndImage() {

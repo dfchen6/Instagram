@@ -28,6 +28,17 @@ class UserMedia: NSObject {
         commentsCounts = object["commentsCount"] as? Int
         likesCount = object["likesCount"] as? Int
         mediaPFFile = object["media"] as! PFFile
+        if author!.objectForKey("profilePhoto") != nil {
+            let profileMedia = author!["profilePhoto"]
+            profileMedia.getDataInBackgroundWithBlock { (imageData: NSData?, error: NSError?) -> Void in
+                if imageData != nil {
+                    let image = UIImage(data:imageData!)
+                    self.profileImage = image
+                }
+            }
+        } else {
+            self.profileImage = UIImage(named: "profile")
+        }
     }
     
     func timeElapsed() -> String {
@@ -64,6 +75,12 @@ class UserMedia: NSObject {
         media.saveInBackgroundWithBlock(completion)
     }
     
+    class func postUserProfileImage(image: UIImage?, withCompletion completion: PFBooleanResultBlock?) {
+        let user = PFUser.currentUser()!
+        user["profilePhoto"] = getPFFileFromImage(image)
+        user.saveInBackgroundWithBlock(completion)
+    }
+    
     /**
      Method to post user media to Parse by uploading image file
      
@@ -80,5 +97,5 @@ class UserMedia: NSObject {
             }
         }
         return nil
-    }    
+    }
 }

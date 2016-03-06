@@ -18,7 +18,6 @@ class mediaTableViewCell: UITableViewCell {
     
     var userMedia: UserMedia! {
         didSet {
-            print(userMedia.author)
             var userName = userMedia.author?["username"] as? String
             if let userName = userName {
                 userNameLabel.text = userName
@@ -33,6 +32,7 @@ class mediaTableViewCell: UITableViewCell {
                 }
             }
             timeStampLabel.text = userMedia.timeElapsed()
+            profileImageView.image = userMedia.profileImage
         }
     }
     

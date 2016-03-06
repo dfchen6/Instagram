@@ -17,7 +17,15 @@ class signupViewController: UIViewController {
     @IBOutlet weak var usernameTextField: UITextField!
     override func viewDidLoad() {
         super.viewDidLoad()
+        let tapGesture = UITapGestureRecognizer(target: self, action: "tap:")
+        view.addGestureRecognizer(tapGesture)
         // Do any additional setup after loading the view, typically from a nib.
+    }
+    
+    func tap(gesture: UITapGestureRecognizer) {
+        passwordTextField.resignFirstResponder()
+        repeatPasswordTextField.resignFirstResponder()
+        usernameTextField.resignFirstResponder()
     }
     
     @IBAction func onCancelSignup(sender: AnyObject) {
@@ -44,6 +52,7 @@ class signupViewController: UIViewController {
                 // manually segue to logged in view
             }
         }
+        performSegueWithIdentifier("backToLogin", sender: nil)
     }
     
     override func didReceiveMemoryWarning() {
